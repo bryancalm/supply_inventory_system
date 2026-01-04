@@ -16,12 +16,7 @@ $page = $_GET['page'] ?? 'home';
 <html>
 <head>
 <title>Dashboard - Supply Inventory</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -32,10 +27,15 @@ body{
     display:flex;
     flex-direction:column;
 }
+/* Updated Topbar Styles */
 .topbar{
     background:#3e1f77;
     color:white;
-    padding:12px 25px;
+    padding:10px 25px;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .brand{
     font-size:22px;
@@ -43,113 +43,108 @@ body{
     text-decoration:none;
     color:white;
 }
-.brand:hover{
-    color:#ffd56a;
+.brand:hover{ color:#ffd56a; }
+
+/* Sidebar Drawer Styles */
+.offcanvas {
+    background-color: #2a1a4f;
+    color: white;
+    width: 280px !important;
 }
-.hero{
-    background:white;
-    border-radius:20px;
-    padding:40px;
-    margin-top:25px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+.offcanvas-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.big-title{
-    font-size:38px;
-    font-weight:900;
-    color:#2a1a4f;
+.drawer-link {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-radius: 8px;
+    transition: 0.3s;
+    margin: 4px 15px;
 }
-.subtext{
-    font-size:16px;
+.drawer-link:hover, .drawer-link.active {
+    background: #5a2bb5;
+    color: #ffd56a;
 }
-.stat-card{
-    border-radius:18px;
-    padding:25px;
-    color:white;
-}
-.purple{background:#5a2bb5;}
-.pink{background:#ff4d8b;}
-.blue{background:#0096ff;}
-.orange{background:#ff9f3f;}
-.nav-btn{
-    color:white;
-    margin-right:12px;
-    text-decoration:none;
-    font-weight:500;
-}
-.nav-btn:hover{
-    color:#ffd56a;
-}
-.module-card{
-    border-radius:16px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.05);
-}
-.feature-box{
-    background:#ffffff;
-    border-radius:20px;
-    padding:30px;
-    text-align:center;
-    box-shadow:0 8px 20px rgba(0,0,0,0.05);
-}
-.footer-section{
-    background:#431c6e;
-    color:white;
-    margin-top:40px;
-    padding:40px 20px;
-    border-radius:25px;
-}
-.global-footer{
-    background:#2a1a4f;
-    color:white;
-    padding:18px;
-    margin-top:40px;
-    text-align:center;
-}
+.drawer-link i { font-size: 1.2rem; }
+
+/* Your Existing Content Styles */
+.hero{ background:white; border-radius:20px; padding:40px; margin-top:25px; box-shadow:0 10px 25px rgba(0,0,0,0.08); }
+.big-title{ font-size:38px; font-weight:900; color:#2a1a4f; }
+.subtext{ font-size:16px; }
+.stat-card{ border-radius:18px; padding:25px; color:white; }
+.purple{background:#5a2bb5;} .pink{background:#ff4d8b;} .blue{background:#0096ff;} .orange{background:#ff9f3f;}
+.module-card{ border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.05); }
+.feature-box{ background:#ffffff; border-radius:20px; padding:30px; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,0.05); }
+.footer-section{ background:#431c6e; color:white; margin-top:40px; padding:40px 20px; border-radius:25px; }
+.global-footer{ background:#2a1a4f; color:white; padding:18px; margin-top:40px; text-align:center; }
 </style>
 </head>
 <body>
 
 <div class="topbar d-flex justify-content-between align-items-center">
-    <div>
+    <div class="d-flex align-items-center">
+        <button class="btn text-white p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#navDrawer">
+            <i class="bi bi-list fs-2"></i>
+        </button>
         <a href="dashboard.php" class="brand">Supply Inventory</a>
     </div>
 
-    <div>
-      <?php if ($role=="Admin"): ?>
-    <a class="nav-btn" href="dashboard.php?page=users">
-        <i class="bi bi-people-fill"></i> Users
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=categories">
-        <i class="bi bi-tags-fill"></i> Categories
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=items">
-        <i class="bi bi-box-fill"></i> Items
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=stock">
-        <i class="bi bi-stack"></i> Stock
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=requests">
-        <i class="bi bi-card-list"></i> Requests
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=reports">
-        <i class="bi bi-bar-chart-fill"></i> Reports
-    </a>
-<?php endif; ?>
+    <div class="d-flex align-items-center">
+        <span class="d-none d-md-inline ms-3 me-2 opacity-75 small"><?= $fullname ?> (<?= $role ?>)</span>
+        <a href="logout.php" class="btn btn-warning btn-sm text-dark fw-bold">Logout</a>
+    </div>
+</div>
 
-<?php if ($role=="Staff"): ?>
-    <a class="nav-btn" href="dashboard.php?page=request_supply">
-        <i class="bi bi-pencil-square"></i> Request Supplies
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=view_stock">
-        <i class="bi bi-box"></i> View Stock
-    </a>
-    <a class="nav-btn" href="dashboard.php?page=my_requests">
-        <i class="bi bi-card-checklist"></i> My Requests
-    </a>
-<?php endif; ?>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="navDrawer" aria-labelledby="navDrawerLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold" id="navDrawerLabel">Menu Navigation</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0 pt-3">
+        
+        <?php if ($role=="Admin"): ?>
+            <a class="drawer-link <?= $page=='home'?'active':'' ?>" href="dashboard.php">
+                <i class="bi bi-house-door-fill"></i> Home
+            </a>
+            <a class="drawer-link <?= $page=='users'?'active':'' ?>" href="dashboard.php?page=users">
+                <i class="bi bi-people-fill"></i> Users
+            </a>
+            <a class="drawer-link <?= $page=='categories'?'active':'' ?>" href="dashboard.php?page=categories">
+                <i class="bi bi-tags-fill"></i> Categories
+            </a>
+            <a class="drawer-link <?= $page=='items'?'active':'' ?>" href="dashboard.php?page=items">
+                <i class="bi bi-box-fill"></i> Items
+            </a>
+            <a class="drawer-link <?= $page=='stock'?'active':'' ?>" href="dashboard.php?page=stock">
+                <i class="bi bi-stack"></i> Stock
+            </a>
+            <a class="drawer-link <?= $page=='requests'?'active':'' ?>" href="dashboard.php?page=requests">
+                <i class="bi bi-card-list"></i> Requests
+            </a>
+            <a class="drawer-link <?= $page=='reports'?'active':'' ?>" href="dashboard.php?page=reports">
+                <i class="bi bi-bar-chart-fill"></i> Reports
+            </a>
+        <?php endif; ?>
 
+        <?php if ($role=="Staff"): ?>
+            <a class="drawer-link <?= $page=='home'?'active':'' ?>" href="dashboard.php">
+                <i class="bi bi-house-door-fill"></i> Home
+            </a>
+            <a class="drawer-link <?= $page=='request_supply'?'active':'' ?>" href="dashboard.php?page=request_supply">
+                <i class="bi bi-pencil-square"></i> Request Supplies
+            </a>
+            <a class="drawer-link <?= $page=='view_stock'?'active':'' ?>" href="dashboard.php?page=view_stock">
+                <i class="bi bi-box"></i> View Stock
+            </a>
+            <a class="drawer-link <?= $page=='my_requests'?'active':'' ?>" href="dashboard.php?page=my_requests">
+                <i class="bi bi-card-checklist"></i> My Requests
+            </a>
+        <?php endif; ?>
 
-        <span class="ms-3 me-2"><?= $fullname ?> (<?= $role ?>)</span>
-        <a href="logout.php" class="btn btn-warning btn-sm text-dark">Logout</a>
     </div>
 </div>
 

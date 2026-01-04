@@ -5,7 +5,7 @@ if ($_SESSION['role'] != 'Admin') {
     exit;
 }
 
-// FETCH CATEGORIES (for add form)
+// FETCH CATEGORIES
 $categories = $conn->query("SELECT * FROM categories");
 
 /* ======================
@@ -26,7 +26,7 @@ if (isset($_POST['add'])) {
     $stmt->bind_param("siissd", $name, $category, $qty, $unit, $supplier, $price);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=items");
+    header("Location: dashboard.php?page=items&status=added");
     exit;
 }
 
@@ -37,12 +37,12 @@ if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     $conn->query("DELETE FROM items WHERE id=$id");
 
-    header("Location: dashboard.php?page=items");
+    header("Location: dashboard.php?page=items&status=deleted");
     exit;
 }
 
 /* ======================
-   UPDATE ITEM (STOCK INCLUDED)
+   UPDATE ITEM
 ====================== */
 if (isset($_POST['update'])) {
     $id       = $_POST['id'];
@@ -61,12 +61,12 @@ if (isset($_POST['update'])) {
     $stmt->bind_param("siissdi", $name, $category, $qty, $unit, $supplier, $price, $id);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=items");
+    header("Location: dashboard.php?page=items&status=updated");
     exit;
 }
 
 /* ======================
-   FETCH ITEMS (DEFAULT)
+   FETCH ITEMS
 ====================== */
 $result = $conn->query(
     "SELECT items.*, categories.name AS cat_name
@@ -75,6 +75,9 @@ $result = $conn->query(
      ORDER BY items.name ASC"
 );
 ?>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <h4 class="mb-3">Item Management</h4>
 
@@ -108,13 +111,6 @@ $result = $conn->query(
     </div>
 </form>
 
-<!-- LIVE SEARCH -->
-<div class="card mb-3">
-    <div class="card-body">
-        <input type="text" id="searchItem" class="form-control" placeholder="Search item...">
-    </div>
-</div>
-
 <!-- ITEMS TABLE -->
 <div class="card">
 <div class="card-body p-0">
@@ -130,7 +126,7 @@ $result = $conn->query(
             <th width="200">Action</th>
         </tr>
     </thead>
-    <tbody id="itemsTable">
+    <tbody>
     <?php while ($row = $result->fetch_assoc()): ?>
         <form method="POST">
         <tr>
@@ -150,25 +146,17 @@ $result = $conn->query(
                     <?php endwhile; ?>
                 </select>
             </td>
-            <td>
-                <input name="quantity" type="number" value="<?= $row['quantity'] ?>" class="form-control">
-            </td>
-            <td>
-                <input name="unit" value="<?= $row['unit'] ?>" class="form-control">
-            </td>
-            <td>
-                <input name="supplier" value="<?= $row['supplier'] ?>" class="form-control">
-            </td>
-            <td>
-                <input name="price" type="number" step="0.01" value="<?= $row['price'] ?>" class="form-control">
-            </td>
+            <td><input name="quantity" type="number" value="<?= $row['quantity'] ?>" class="form-control"></td>
+            <td><input name="unit" value="<?= $row['unit'] ?>" class="form-control"></td>
+            <td><input name="supplier" value="<?= $row['supplier'] ?>" class="form-control"></td>
+            <td><input name="price" type="number" step="0.01" value="<?= $row['price'] ?>" class="form-control"></td>
             <td class="text-center">
                 <button name="update" class="btn btn-success btn-sm">Update</button>
-                <a href="dashboard.php?page=items&delete=<?= $row['id'] ?>"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Delete this item?')">
-                   Delete
-                </a>
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        onclick="confirmDelete(<?= $row['id'] ?>)">
+                        Delete
+                </button>
             </td>
         </tr>
         </form>
@@ -178,14 +166,33 @@ $result = $conn->query(
 </div>
 </div>
 
-<!-- LIVE SEARCH SCRIPT -->
+<!-- SweetAlert Delete -->
 <script>
-const searchItem = document.getElementById("searchItem");
-const itemsTable = document.getElementById("itemsTable");
-
-searchItem.addEventListener("keyup", function () {
-    fetch("admin/items_search.php?q=" + encodeURIComponent(this.value))
-        .then(res => res.text())
-        .then(data => itemsTable.innerHTML = data);
-});
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'This item will be permanently deleted!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "dashboard.php?page=items&delete=" + id;
+        }
+    });
+}
 </script>
+
+<!-- SweetAlert Status -->
+<?php if (isset($_GET['status'])): ?>
+<script>
+<?php if ($_GET['status'] == 'added'): ?>
+Swal.fire({ icon:'success', title:'Item Added', timer:1500, showConfirmButton:false });
+<?php elseif ($_GET['status'] == 'updated'): ?>
+Swal.fire({ icon:'success', title:'Item Updated', timer:1500, showConfirmButton:false });
+<?php elseif ($_GET['status'] == 'deleted'): ?>
+Swal.fire({ icon:'success', title:'Item Deleted', timer:1500, showConfirmButton:false });
+<?php endif; ?>
+</script>
+<?php endif; ?>
