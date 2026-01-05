@@ -1,7 +1,7 @@
 <?php
-// STAFF ONLY
+// STAFF ONLY check
 if ($_SESSION['role'] != 'Staff') {
-    echo "<div class='alert alert-danger'>Access denied.</div>";
+    echo "<div class='alert alert-danger m-3'>Access denied.</div>";
     exit;
 }
 
@@ -14,96 +14,95 @@ $result = $conn->query("
 ");
 ?>
 
-<div class="container-fluid mt-4">
-
-    <h4 class="fw-bold mb-3">Available Stock</h4>
-
-    <!-- SEARCH -->
-    <div class="mb-3">
-        <input type="text" id="search" class="form-control form-control-lg"
-               placeholder="🔍 Search item, category, supplier...">
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">Available Stock</h4>
+            <p class="text-muted small mb-0">View and search real-time inventory levels.</p>
+        </div>
+        <div class="bg-success bg-opacity-10 p-2 rounded-3">
+            <i class="bi bi-box-seam text-success fs-4"></i>
+        </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="table-responsive">
-        <table class="table table-striped table-hover table-bordered align-middle mb-0 text-center">
-            <thead class="table-dark">
-                <tr>
-                    <th style="width:20%">Item</th>
-                    <th style="width:15%">Category</th>
-                    <th style="width:10%">Quantity</th>
-                    <th style="width:10%">Unit</th>
-                    <th style="width:25%">Supplier</th>
-                    <th style="width:20%">Price</th>
-                </tr>
-            </thead>
-            <tbody id="stockTable">
-                <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <!-- ITEM -->
-                    <td class="text-start ps-3 fw-semibold">
-                        <?= htmlspecialchars($row['name']) ?>
-                    </td>
-
-                    <!-- CATEGORY -->
-                    <td>
-                        <span class="badge bg-secondary px-2 py-1">
-                            <?= htmlspecialchars($row['cat_name']) ?>
-                        </span>
-                    </td>
-
-                    <!-- QUANTITY -->
-                    <td>
-                        <?php if ($row['quantity'] <= 5): ?>
-                            <span class="badge bg-danger px-2 py-1">
-                                <?= $row['quantity'] ?> ⚠️
-                            </span>
-                        <?php else: ?>
-                            <span class="badge bg-success px-2 py-1">
-                                <?= $row['quantity'] ?>
-                            </span>
-                        <?php endif; ?>
-                    </td>
-
-                    <!-- UNIT -->
-                    <td><?= htmlspecialchars($row['unit']) ?></td>
-
-                    <!-- SUPPLIER -->
-                    <td class="text-start ps-3"><?= htmlspecialchars($row['supplier']) ?></td>
-
-                    <!-- PRICE -->
-                    <td class="text-end pe-3">
-                        <?php 
-                            $price = $row['price'];
-                            // Price badge colors
-                            if ($price > 1000) {
-                                $badgeClass = "bg-warning text-dark"; // high price
-                            } elseif ($price < 100) {
-                                $badgeClass = "bg-info text-white";   // low price
-                            } else {
-                                $badgeClass = "bg-light text-dark";  // normal price
-                            }
-                        ?>
-                        <span class="badge <?= $badgeClass ?> px-2 py-1">
-                            ₱<?= number_format($price, 2, '.', ',') ?>
-                        </span>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-body p-3">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="search" class="form-control border-start-0 ps-0 shadow-none" 
+                       placeholder="Search by item name, category, or supplier...">
+            </div>
+        </div>
     </div>
 
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 12px;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr class="small text-uppercase">
+                        <th class="ps-4 py-3">Item Details</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Unit</th>
+                        <th>Supplier</th>
+                        <th class="pe-4 text-end">Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTable">
+                    <?php if ($result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold d-block text-dark"><?= htmlspecialchars($row['name']) ?></span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3">
+                                    <?= htmlspecialchars($row['cat_name']) ?>
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <?php if ($row['quantity'] <= 5): ?>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1">
+                                        <?= $row['quantity'] ?> <i class="bi bi-exclamation-triangle ms-1"></i>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1">
+                                        <?= $row['quantity'] ?>
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="text-center text-muted small"><?= htmlspecialchars($row['unit']) ?></td>
+
+                            <td class="text-muted small"><?= htmlspecialchars($row['supplier']) ?></td>
+
+                            <td class="pe-4 text-end">
+                                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50 px-3 py-1 fw-bold">
+                                    ₱<?= number_format($row['price'], 2) ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr><td colspan="6" class="text-center py-5 text-muted">No stock items found.</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- LIVE SEARCH -->
 <script>
 const searchInput = document.getElementById("search");
 const stockTable  = document.getElementById("stockTable");
 
 searchInput.addEventListener("keyup", function () {
     const query = this.value;
-
+    // FETCH via your existing staff/view_stock_search.php
     fetch("staff/view_stock_search.php?q=" + encodeURIComponent(query))
         .then(res => res.text())
         .then(data => {

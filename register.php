@@ -10,31 +10,29 @@ if(isset($_POST['register'])){
     $username = trim($_POST['username']);
     $password = $_POST['password'];
     $confirm = $_POST['confirm'];
-    $role = $_POST['role'];
+    // Automatically set role to Staff for all new registrations
+    $role = "Staff"; 
 
-    // 1. Password match check
     if($password !== $confirm){
-        $message = "<div class='alert alert-danger text-center'>Passwords do not match!</div>";
+        $message = "<div class='alert alert-danger shadow-sm'>Passwords do not match!</div>";
     } else {
-        // 2. Check if username or email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username=? OR email=?");
         $stmt->bind_param("ss", $username, $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if($result->num_rows > 0){
-            $message = "<div class='alert alert-danger text-center'>Username or email already exists!</div>";
+            $message = "<div class='alert alert-danger shadow-sm'>Username or email already exists!</div>";
         } else {
-            // 3. Insert new user
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("INSERT INTO users (fullname,email,username,password,role) VALUES (?,?,?,?,?)");
             $stmt->bind_param("sssss", $fullname, $email, $username, $hashed_password, $role);
             if($stmt->execute()){
-                $message = "<div class='alert alert-success text-center'>
+                $message = "<div class='alert alert-success shadow-sm'>
                                 Registration successful! <a href='login.php' class='alert-link'>Login here</a>
                             </div>";
             } else {
-                $message = "<div class='alert alert-danger text-center'>Error: ".$stmt->error."</div>";
+                $message = "<div class='alert alert-danger shadow-sm'>Error: ".$stmt->error."</div>";
             }
         }
     }
@@ -45,13 +43,11 @@ if(isset($_POST['register'])){
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register | Supply Inventory</title>
+    <title>Create Account | Supply Inventory</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Custom Styles -->
     <style>
         body {
             min-height: 100vh;
@@ -61,7 +57,7 @@ if(isset($_POST['register'])){
             background: linear-gradient(135deg, #667eea, #764ba2, #f6b93b, #6a82fb);
             background-size: 400% 400%;
             animation: gradientMove 15s ease infinite;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         @keyframes gradientMove {
@@ -71,99 +67,124 @@ if(isset($_POST['register'])){
         }
 
         .register-card {
-            border-radius: 1rem;
-            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.3);
-            background-color: #ffffffdd;
-            padding: 2rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.2);
+            background-color: #ffffff; /* Professional solid white */
+            padding: 2.5rem;
+            border: none;
         }
 
         .fade-in {
-            animation: fadeIn 1s ease-in-out;
+            animation: fadeIn 0.6s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px);}
+            from { opacity: 0; transform: translateY(10px);}
             to { opacity: 1; transform: translateY(0);}
         }
 
-        .btn-primary {
-            background-color: #1cc88a;
+        /* Styling buttons to match your system theme */
+        .btn-register {
+            background-color: #3e1f77; 
             border: none;
+            padding: 0.8rem;
+            font-weight: 600;
+            color: white;
+            transition: 0.3s;
         }
 
-        .btn-primary:hover {
-            background-color: #17a673;
+        .btn-register:hover {
+            background-color: #2a1a4f;
+            color: #ffd56a;
+            transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background-color: #6c757d;
-            border: none;
+        .login-link {
+            text-decoration: none;
+            color: #3e1f77;
+            font-weight: 600;
         }
 
-        .btn-secondary:hover {
-            background-color: #5a6268;
+        .login-link:hover {
+            color: #5a2bb5;
+            text-decoration: underline;
         }
 
-        .footer-text {
-            color: #ffffffcc;
+        .form-floating > .form-control:focus {
+            border-color: #3e1f77;
+            box-shadow: 0 0 0 0.25rem rgba(62, 31, 119, 0.1);
         }
     </style>
 </head>
 <body>
 
-<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="row w-100 justify-content-center">
-        <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+<div class="container fade-in">
+    <div class="row justify-content-center">
+        <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
 
-            <div class="register-card fade-in">
-                <h3 class="text-center mb-4 fw-bold">Register - Supply Inventory</h3>
+            <div class="register-card">
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="bi bi-person-plus-fill fs-1 text-primary" style="color: #3e1f77 !important;"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Create Account</h3>
+                    <p class="text-muted small">Join the Supply Inventory Management System</p>
+                </div>
 
-                <!-- Display message -->
                 <?php if($message!=""): ?>
-                    <?= $message ?>
+                    <div class="mb-3"><?= $message ?></div>
                 <?php endif; ?>
 
                 <form method="POST">
-                    <div class="mb-3">
-                        <input type="text" name="fullname" placeholder="Full Name" class="form-control" required>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="fullname" class="form-control" id="fName" placeholder="John Doe" required>
+                        <label for="fName">Full Name</label>
                     </div>
 
-                    <div class="mb-3">
-                        <input type="email" name="email" placeholder="Email" class="form-control" required>
+                    <div class="form-floating mb-3">
+                        <input type="email" name="email" class="form-control" id="fEmail" placeholder="name@example.com" required>
+                        <label for="fEmail">Email Address</label>
                     </div>
 
-                    <div class="mb-3">
-                        <input type="text" name="username" placeholder="Username" class="form-control" required>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="username" class="form-control" id="fUser" placeholder="username" required>
+                        <label for="fUser">Username</label>
                     </div>
 
-                    <div class="mb-3">
-                        <input type="password" name="password" placeholder="Password" class="form-control" required>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="password" name="password" class="form-control" id="fPass" placeholder="Password" required>
+                                <label for="fPass">Password</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="password" name="confirm" class="form-control" id="fConfirm" placeholder="Confirm" required>
+                                <label for="fConfirm">Confirm Password</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <input type="password" name="confirm" placeholder="Confirm Password" class="form-control" required>
+                    <button type="submit" name="register" class="btn btn-register w-100 mb-3 shadow-sm rounded-pill">
+                        Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="small text-muted mb-0">Already have an account?</p>
+                        <a href="login.php" class="login-link small">Sign In here</a>
                     </div>
-
-                    <div class="mb-3">
-                        <select name="role" class="form-control" required>
-                            <option value="">Select Role</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Staff">Staff</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" name="register" class="btn btn-primary w-100 mb-2">Register</button>
-                    <a href="login.php" class="btn btn-secondary w-100">Login</a>
                 </form>
             </div>
 
-            <p class="text-center mt-3 footer-text small">
-                © <?= date('Y') ?> Supply Inventory System
+            <p class="text-center mt-4 text-white-50 small">
+                © <?= date('Y') ?> Supply Inventory System • All Rights Reserved
             </p>
 
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

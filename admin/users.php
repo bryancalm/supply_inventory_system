@@ -1,4 +1,3 @@
-
 <?php
 // ADMIN ONLY
 if ($_SESSION['role'] != 'Admin') {
@@ -23,7 +22,8 @@ if (isset($_POST['add'])) {
     $stmt->bind_param("sssss", $fullname, $email, $username, $password, $role);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=users&status=added");
+    // Changed to JS Redirect to avoid "Header already sent" error
+    echo "<script>window.location.href='dashboard.php?page=users&status=added';</script>";
     exit;
 }
 
@@ -45,7 +45,8 @@ if (isset($_POST['update'])) {
     $stmt->bind_param("ssssi", $fullname, $email, $username, $role, $id);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=users&status=updated");
+    // Changed to JS Redirect
+    echo "<script>window.location.href='dashboard.php?page=users&status=updated';</script>";
     exit;
 }
 
@@ -62,7 +63,8 @@ if (isset($_POST['reset_password'])) {
     $stmt->bind_param("si", $password, $id);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=users&status=reset");
+    // Changed to JS Redirect
+    echo "<script>window.location.href='dashboard.php?page=users&status=reset';</script>";
     exit;
 }
 
@@ -76,7 +78,8 @@ if (isset($_GET['delete'])) {
     $stmt->bind_param("i", $id);
     $stmt->execute();
 
-    header("Location: dashboard.php?page=users&status=deleted");
+    // Changed to JS Redirect
+    echo "<script>window.location.href='dashboard.php?page=users&status=deleted';</script>";
     exit;
 }
 
@@ -88,106 +91,104 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <h4 class="mb-3">User Management</h4>
 
-<!-- ADD USER -->
 <div class="card mb-4">
     <div class="card-body">
-        <h6 class="mb-3">Add User</h6>
-        <form method="POST" class="row g-2">
-            <div class="col-md-3">
+        <h6 class="mb-3 fw-bold">Add New User</h6>
+        <form method="POST" class="row g-3"> <div class="col-12 col-md-6 col-lg-3">
+                <label class="small fw-bold">Full Name</label>
                 <input name="fullname" class="form-control" placeholder="Full Name" required>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-md-6 col-lg-3">
+                <label class="small fw-bold">Email</label>
                 <input name="email" type="email" class="form-control" placeholder="Email" required>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-6 col-lg-2">
+                <label class="small fw-bold">Username</label>
                 <input name="username" class="form-control" placeholder="Username" required>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-6 col-lg-2">
+                <label class="small fw-bold">Password</label>
                 <input name="password" type="password" class="form-control" placeholder="Password" required>
             </div>
-            <div class="col-md-2">
+            <div class="col-12 col-md-12 col-lg-2">
+                <label class="small fw-bold">Role</label>
                 <select name="role" class="form-control" required>
-                    <option value="">Role</option>
+                    <option value="">Select Role</option>
                     <option value="Admin">Admin</option>
                     <option value="Staff">Staff</option>
                 </select>
             </div>
-            <div class="col-md-12 text-end">
-                <button name="add" class="btn btn-primary">Add User</button>
+            <div class="col-12 text-end mt-3">
+                <button name="add" class="btn btn-primary w-100 w-md-auto">Add User</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- SEARCH -->
 <div class="card mb-3">
     <div class="card-body">
         <input type="text" id="search" class="form-control" placeholder="Search users...">
     </div>
 </div>
 
-<!-- USERS TABLE -->
-<div class="card">
-<div class="card-body p-0">
-<table class="table table-bordered table-hover mb-0">
-<thead class="table-dark">
-<tr>
-    <th>Full Name</th>
-    <th>Email</th>
-    <th>Username</th>
-    <th>Role</th>
-    <th width="220">Action</th>
-</tr>
-</thead>
-<tbody id="usersTable">
-<?php while ($row = $result->fetch_assoc()): ?>
-<tr>
-<form method="POST">
-    <td>
-        <input type="hidden" name="id" value="<?= $row['id'] ?>">
-        <input name="fullname" value="<?= htmlspecialchars($row['fullname']) ?>" class="form-control">
-    </td>
-    <td>
-        <input name="email" type="email" value="<?= htmlspecialchars($row['email']) ?>" class="form-control">
-    </td>
-    <td>
-        <input name="username" value="<?= htmlspecialchars($row['username']) ?>" class="form-control">
-    </td>
-    <td>
-        <select name="role" class="form-control">
-            <option value="Admin" <?= $row['role']=='Admin'?'selected':'' ?>>Admin</option>
-            <option value="Staff" <?= $row['role']=='Staff'?'selected':'' ?>>Staff</option>
-        </select>
-    </td>
-    <td class="text-center">
-        <button name="update" class="btn btn-success btn-sm mb-1">Update</button>
-
-        <button type="button"
-                class="btn btn-warning btn-sm mb-1"
-                onclick="resetPassword(<?= $row['id'] ?>, '<?= htmlspecialchars($row['username']) ?>')">
-            Reset Password
-        </button>
-
-        <button type="button"
-                class="btn btn-danger btn-sm"
-                onclick="confirmDelete(<?= $row['id'] ?>)">
-            Delete
-        </button>
-    </td>
-</form>
-</tr>
-<?php endwhile; ?>
-</tbody>
-</table>
-</div>
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive"> <table class="table table-bordered table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="min-width: 150px;">Full Name</th>
+                        <th style="min-width: 150px;">Email</th>
+                        <th style="min-width: 120px;">Username</th>
+                        <th style="min-width: 100px;">Role</th>
+                        <th style="min-width: 250px;" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable">
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <form method="POST">
+                            <td>
+                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                <input name="fullname" value="<?= htmlspecialchars($row['fullname']) ?>" class="form-control form-control-sm">
+                            </td>
+                            <td>
+                                <input name="email" type="email" value="<?= htmlspecialchars($row['email']) ?>" class="form-control form-control-sm">
+                            </td>
+                            <td>
+                                <input name="username" value="<?= htmlspecialchars($row['username']) ?>" class="form-control form-control-sm">
+                            </td>
+                            <td>
+                                <select name="role" class="form-select form-select-sm">
+                                    <option value="Admin" <?= $row['role']=='Admin'?'selected':'' ?>>Admin</option>
+                                    <option value="Staff" <?= $row['role']=='Staff'?'selected':'' ?>>Staff</option>
+                                </select>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <button name="update" class="btn btn-success btn-sm flex-fill">Update</button>
+                                    <button type="button" class="btn btn-warning btn-sm flex-fill text-dark" 
+                                            onclick="resetPassword(<?= $row['id'] ?>, '<?= htmlspecialchars($row['username']) ?>')">
+                                        Reset
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm flex-fill" 
+                                            onclick="confirmDelete(<?= $row['id'] ?>)">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </form>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- DELETE CONFIRM -->
 <script>
 function confirmDelete(id) {
     Swal.fire({
@@ -199,15 +200,11 @@ function confirmDelete(id) {
         confirmButtonText: 'Yes, delete'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href =
-                "dashboard.php?page=users&delete=" + id;
+            window.location.href = "dashboard.php?page=users&delete=" + id;
         }
     });
 }
-</script>
 
-<!-- RESET PASSWORD MODAL -->
-<script>
 function resetPassword(id, username) {
     Swal.fire({
         title: 'Reset Password',
@@ -219,9 +216,7 @@ function resetPassword(id, username) {
         confirmButtonColor: '#f0ad4e',
         preConfirm: (password) => {
             if (!password || password.length < 6) {
-                Swal.showValidationMessage(
-                    'Password must be at least 6 characters'
-                );
+                Swal.showValidationMessage('Password must be at least 6 characters');
             }
             return password;
         }
@@ -229,13 +224,11 @@ function resetPassword(id, username) {
         if (result.isConfirmed) {
             const form = document.createElement('form');
             form.method = 'POST';
-
             form.innerHTML = `
                 <input type="hidden" name="id" value="${id}">
                 <input type="hidden" name="new_password" value="${result.value}">
                 <input type="hidden" name="reset_password" value="1">
             `;
-
             document.body.appendChild(form);
             form.submit();
         }
@@ -243,7 +236,6 @@ function resetPassword(id, username) {
 }
 </script>
 
-<!-- STATUS ALERT -->
 <?php if (isset($_GET['status'])): ?>
 <script>
 <?php if ($_GET['status'] == 'added'): ?>
@@ -258,7 +250,6 @@ Swal.fire({ icon:'success', title:'Password Reset Successfully', timer:1500, sho
 </script>
 <?php endif; ?>
 
-<!-- LIVE SEARCH -->
 <script>
 const searchInput = document.getElementById("search");
 const usersTable  = document.getElementById("usersTable");
@@ -269,3 +260,28 @@ searchInput.addEventListener("keyup", function () {
         .then(data => usersTable.innerHTML = data);
 });
 </script>
+<style>
+/* Make form controls smaller in the table for better fit */
+.table .form-control-sm, .table .form-select-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Ensure action buttons don't get too small */
+.btn-sm {
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* On mobile, allow the action div to wrap if necessary */
+@media (max-width: 576px) {
+    .d-flex.gap-1 {
+        flex-wrap: wrap;
+    }
+    .flex-fill {
+        flex: 1 1 auto;
+        min-width: 70px;
+    }
+}
+</style>
