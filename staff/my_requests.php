@@ -1,7 +1,13 @@
 <?php
+<<<<<<< HEAD
 // SECURITY: Staff only check
 if ($_SESSION['role'] != 'Staff') {
     echo "<div class='alert alert-danger m-3'>Access denied.</div>";
+=======
+// STAFF ONLY
+if ($_SESSION['role'] != 'Staff') {
+    echo "<div class='alert alert-danger'>Access denied.</div>";
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -17,6 +23,7 @@ $result = $conn->query("
 ");
 ?>
 
+<<<<<<< HEAD
 <div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -85,3 +92,33 @@ $result = $conn->query("
         </div>
     </div>
 </div>
+=======
+<h4>My Requests</h4>
+
+<table class="table table-bordered table-sm">
+    <tr class="table-dark">
+        <th>Date</th>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Admin Comment</th>
+    </tr>
+
+<?php while($row = $result->fetch_assoc()): ?>
+<tr>
+    <td><?= $row['request_date'] ?></td>
+    <td><?= $row['item_name'] ?></td>
+    <td><?= $row['quantity'] ?></td>
+    <td>
+        <span class="badge 
+            <?= $row['status']=='Pending'?'bg-warning':'' ?>
+            <?= $row['status']=='Approved'?'bg-success':'' ?>
+            <?= $row['status']=='Denied'?'bg-danger':'' ?>">
+            <?= $row['status'] ?>
+        </span>
+    </td>
+    <td><?= $row['admin_comment'] ?></td>
+</tr>
+<?php endwhile; ?>
+</table>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 // STAFF ONLY check
 if ($_SESSION['role'] != 'Staff') {
     echo "<div class='alert alert-danger m-3'>Access denied.</div>";
@@ -6,6 +7,15 @@ if ($_SESSION['role'] != 'Staff') {
 }
 
 // FETCH STOCK
+=======
+// STAFF ONLY
+if ($_SESSION['role'] != 'Staff') {
+    echo "<div class='alert alert-danger'>Access denied.</div>";
+    exit;
+}
+
+// DEFAULT FETCH
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 $result = $conn->query("
     SELECT items.*, categories.name AS cat_name
     FROM items
@@ -14,6 +24,7 @@ $result = $conn->query("
 ");
 ?>
 
+<<<<<<< HEAD
 <div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -96,17 +107,67 @@ $result = $conn->query("
     </div>
 </div>
 
+=======
+<h4 class="mb-3">Available Stock</h4>
+
+<!-- SEARCH -->
+<div class="card mb-3">
+    <div class="card-body">
+        <input type="text" id="search" class="form-control" placeholder="Search item...">
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Supplier</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="stockTable">
+                <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['name']) ?></td>
+                    <td><?= htmlspecialchars($row['cat_name']) ?></td>
+                    <td><?= $row['quantity'] ?></td>
+                    <td><?= htmlspecialchars($row['unit']) ?></td>
+                    <td><?= htmlspecialchars($row['supplier']) ?></td>
+                    <td><?= $row['price'] ?></td>
+                </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- LIVE SEARCH SCRIPT -->
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 <script>
 const searchInput = document.getElementById("search");
 const stockTable  = document.getElementById("stockTable");
 
 searchInput.addEventListener("keyup", function () {
     const query = this.value;
+<<<<<<< HEAD
     // FETCH via your existing staff/view_stock_search.php
+=======
+
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     fetch("staff/view_stock_search.php?q=" + encodeURIComponent(query))
         .then(res => res.text())
         .then(data => {
             stockTable.innerHTML = data;
         });
 });
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

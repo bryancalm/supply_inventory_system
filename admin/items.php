@@ -5,8 +5,13 @@ if ($_SESSION['role'] != 'Admin') {
     exit;
 }
 
+<<<<<<< HEAD
 // FETCH CATEGORIES for the dropdown
 $categories = $conn->query("SELECT * FROM categories ORDER BY name ASC");
+=======
+// FETCH CATEGORIES (for add form)
+$categories = $conn->query("SELECT * FROM categories");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 
 /* ======================
    ADD ITEM
@@ -26,7 +31,11 @@ if (isset($_POST['add'])) {
     $stmt->bind_param("siissd", $name, $category, $qty, $unit, $supplier, $price);
     $stmt->execute();
 
+<<<<<<< HEAD
     echo "<script>window.location.href='dashboard.php?page=items&status=added';</script>";
+=======
+    header("Location: dashboard.php?page=items");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -37,12 +46,20 @@ if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     $conn->query("DELETE FROM items WHERE id=$id");
 
+<<<<<<< HEAD
     echo "<script>window.location.href='dashboard.php?page=items&status=deleted';</script>";
+=======
+    header("Location: dashboard.php?page=items");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
 /* ======================
+<<<<<<< HEAD
    UPDATE ITEM
+=======
+   UPDATE ITEM (STOCK INCLUDED)
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 ====================== */
 if (isset($_POST['update'])) {
     $id       = $_POST['id'];
@@ -61,12 +78,20 @@ if (isset($_POST['update'])) {
     $stmt->bind_param("siissdi", $name, $category, $qty, $unit, $supplier, $price, $id);
     $stmt->execute();
 
+<<<<<<< HEAD
     echo "<script>window.location.href='dashboard.php?page=items&status=updated';</script>";
+=======
+    header("Location: dashboard.php?page=items");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
 /* ======================
+<<<<<<< HEAD
    FETCH ITEMS
+=======
+   FETCH ITEMS (DEFAULT)
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 ====================== */
 $result = $conn->query(
     "SELECT items.*, categories.name AS cat_name
@@ -76,6 +101,7 @@ $result = $conn->query(
 );
 ?>
 
+<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <h4 class="mb-3 fw-bold">Item Management</h4>
@@ -187,10 +213,121 @@ const searchItems = document.getElementById("searchItems");
 const itemsTable = document.getElementById("itemsTable");
 
 searchItems.addEventListener("keyup", function () {
+=======
+<h4 class="mb-3">Item Management</h4>
+
+<!-- ADD ITEM -->
+<form method="POST" class="row g-2 mb-4">
+    <div class="col-md-2">
+        <input name="name" class="form-control" placeholder="Item Name" required>
+    </div>
+    <div class="col-md-2">
+        <select name="category" class="form-control" required>
+            <option value="">Category</option>
+            <?php while ($c = $categories->fetch_assoc()): ?>
+                <option value="<?= $c['id'] ?>"><?= $c['name'] ?></option>
+            <?php endwhile; ?>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <input name="quantity" type="number" class="form-control" placeholder="Qty" required>
+    </div>
+    <div class="col-md-1">
+        <input name="unit" class="form-control" placeholder="Unit">
+    </div>
+    <div class="col-md-2">
+        <input name="supplier" class="form-control" placeholder="Supplier">
+    </div>
+    <div class="col-md-2">
+        <input name="price" type="number" step="0.01" class="form-control" placeholder="Price">
+    </div>
+    <div class="col-md-2">
+        <button name="add" class="btn btn-primary w-100">Add Item</button>
+    </div>
+</form>
+
+<!-- LIVE SEARCH -->
+<div class="card mb-3">
+    <div class="card-body">
+        <input type="text" id="searchItem" class="form-control" placeholder="Search item...">
+    </div>
+</div>
+
+<!-- ITEMS TABLE -->
+<div class="card">
+<div class="card-body p-0">
+<table class="table table-bordered table-hover mb-0">
+    <thead class="table-dark">
+        <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Unit</th>
+            <th>Supplier</th>
+            <th>Price</th>
+            <th width="200">Action</th>
+        </tr>
+    </thead>
+    <tbody id="itemsTable">
+    <?php while ($row = $result->fetch_assoc()): ?>
+        <form method="POST">
+        <tr>
+            <td>
+                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                <input name="name" value="<?= $row['name'] ?>" class="form-control">
+            </td>
+            <td>
+                <select name="category" class="form-control">
+                    <?php
+                    $catLoop = $conn->query("SELECT * FROM categories");
+                    while ($c = $catLoop->fetch_assoc()):
+                    ?>
+                        <option value="<?= $c['id'] ?>" <?= ($row['category_id']==$c['id'])?'selected':'' ?>>
+                            <?= $c['name'] ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </td>
+            <td>
+                <input name="quantity" type="number" value="<?= $row['quantity'] ?>" class="form-control">
+            </td>
+            <td>
+                <input name="unit" value="<?= $row['unit'] ?>" class="form-control">
+            </td>
+            <td>
+                <input name="supplier" value="<?= $row['supplier'] ?>" class="form-control">
+            </td>
+            <td>
+                <input name="price" type="number" step="0.01" value="<?= $row['price'] ?>" class="form-control">
+            </td>
+            <td class="text-center">
+                <button name="update" class="btn btn-success btn-sm">Update</button>
+                <a href="dashboard.php?page=items&delete=<?= $row['id'] ?>"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete this item?')">
+                   Delete
+                </a>
+            </td>
+        </tr>
+        </form>
+    <?php endwhile; ?>
+    </tbody>
+</table>
+</div>
+</div>
+
+<!-- LIVE SEARCH SCRIPT -->
+<script>
+const searchItem = document.getElementById("searchItem");
+const itemsTable = document.getElementById("itemsTable");
+
+searchItem.addEventListener("keyup", function () {
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     fetch("admin/items_search.php?q=" + encodeURIComponent(this.value))
         .then(res => res.text())
         .then(data => itemsTable.innerHTML = data);
 });
+<<<<<<< HEAD
 
 function confirmDelete(id) {
     Swal.fire({
@@ -220,3 +357,6 @@ Swal.fire({ icon:'success', title:'Item Deleted', timer:1500, showConfirmButton:
 <?php endif; ?>
 </script>
 <?php endif; ?>
+=======
+</script>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

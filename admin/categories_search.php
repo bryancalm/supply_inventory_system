@@ -16,6 +16,7 @@ $stmt->bind_param("s", $like);
 $stmt->execute();
 $result = $stmt->get_result();
 
+<<<<<<< HEAD
 if ($result->num_rows > 0):
     while ($row = $result->fetch_assoc()):
 ?>
@@ -55,3 +56,31 @@ else:
         </td>
     </tr>
 <?php endif; ?>
+=======
+while ($row = $result->fetch_assoc()):
+?>
+<tr>
+    <form method="POST" action="dashboard.php?page=categories">
+        <td>
+            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+            <input type="text" name="name"
+                   value="<?= $row['name'] ?>"
+                   class="form-control" required>
+        </td>
+        <td>
+            <input type="text" name="description"
+                   value="<?= $row['description'] ?>"
+                   class="form-control">
+        </td>
+        <td class="text-center">
+            <button name="update" class="btn btn-success btn-sm">Update</button>
+            <a href="dashboard.php?page=categories&delete=<?= $row['id'] ?>"
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Delete this category?')">
+               Delete
+            </a>
+        </td>
+    </form>
+</tr>
+<?php endwhile; ?>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

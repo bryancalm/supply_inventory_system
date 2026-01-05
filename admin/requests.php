@@ -1,7 +1,13 @@
 <?php
+<<<<<<< HEAD
 // SECURITY: Admin only check
 if ($_SESSION['role'] != 'Admin') {
     echo "<div class='alert alert-danger m-3'>Access denied.</div>";
+=======
+// ADMIN ONLY
+if ($_SESSION['role'] != 'Admin') {
+    echo "<div class='alert alert-danger'>Access denied.</div>";
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -13,31 +19,53 @@ if (isset($_POST['approve'])) {
     $item_id = $_POST['item_id'];
     $qty = $_POST['quantity'];
 
+<<<<<<< HEAD
     // Check stock level before approving
+=======
+    // Check stock
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     $check = $conn->query("SELECT quantity FROM items WHERE id=$item_id");
     $stock = $check->fetch_assoc()['quantity'];
 
     if ($stock < $qty) {
+<<<<<<< HEAD
         echo "<script>window.location.href='dashboard.php?page=requests&status=low_stock';</script>";
     } else {
         // Deduct stock and log the transaction
         $conn->query("UPDATE items SET quantity = quantity - $qty WHERE id=$item_id");
 
+=======
+        echo "<div class='alert alert-danger'>Insufficient stock.</div>";
+    } else {
+        // Deduct stock
+        $conn->query("UPDATE items SET quantity = quantity - $qty WHERE id=$item_id");
+
+        // Log stock out
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
         $conn->query("
             INSERT INTO stock_logs (item_id, type, quantity, user_id)
             VALUES ($item_id, 'Out', $qty, $admin_id)
         ");
 
+<<<<<<< HEAD
         // Update request status
+=======
+        // Update request
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
         $conn->query("
             UPDATE requests 
             SET status='Approved', admin_comment='Approved'
             WHERE id=$req_id
         ");
 
+<<<<<<< HEAD
         echo "<script>window.location.href='dashboard.php?page=requests&status=approved';</script>";
     }
     exit;
+=======
+        echo "<div class='alert alert-success'>Request approved.</div>";
+    }
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 }
 
 // DENY REQUEST
@@ -53,8 +81,12 @@ if (isset($_POST['deny'])) {
     $stmt->bind_param("si", $comment, $req_id);
     $stmt->execute();
 
+<<<<<<< HEAD
     echo "<script>window.location.href='dashboard.php?page=requests&status=denied';</script>";
     exit;
+=======
+    echo "<div class='alert alert-warning'>Request denied.</div>";
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 }
 
 // FETCH REQUESTS
@@ -67,6 +99,7 @@ $result = $conn->query("
 ");
 ?>
 
+<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid px-0">
@@ -157,3 +190,53 @@ $result = $conn->query("
     }
 </script>
 <?php endif; ?>
+=======
+<h4>Requests & Approval</h4>
+
+<table class="table table-bordered table-sm">
+    <tr class="table-dark">
+        <th>Date</th>
+        <th>Staff</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Status</th>
+        <th>Reason / Comment</th>
+        <th width="260">Action</th>
+    </tr>
+
+<?php while ($row = $result->fetch_assoc()): ?>
+<tr>
+<form method="POST">
+    <td><?= $row['request_date'] ?></td>
+    <td><?= $row['fullname'] ?></td>
+    <td><?= $row['item_name'] ?></td>
+    <td><?= $row['quantity'] ?></td>
+    <td>
+        <span class="badge 
+            <?= $row['status']=='Pending'?'bg-warning':'' ?>
+            <?= $row['status']=='Approved'?'bg-success':'' ?>
+            <?= $row['status']=='Denied'?'bg-danger':'' ?>">
+            <?= $row['status'] ?>
+        </span>
+    </td>
+    <td>
+        <input type="text" name="comment" class="form-control"
+               value="<?= $row['admin_comment'] ?>">
+    </td>
+    <td>
+        <?php if ($row['status'] == 'Pending'): ?>
+            <input type="hidden" name="req_id" value="<?= $row['id'] ?>">
+            <input type="hidden" name="item_id" value="<?= $row['item_id'] ?>">
+            <input type="hidden" name="quantity" value="<?= $row['quantity'] ?>">
+
+            <button name="approve" class="btn btn-success btn-sm">Approve</button>
+            <button name="deny" class="btn btn-danger btn-sm">Deny</button>
+        <?php else: ?>
+            —
+        <?php endif; ?>
+    </td>
+</form>
+</tr>
+<?php endwhile; ?>
+</table>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

@@ -2,7 +2,11 @@
 session_start();
 include '../database.php';
 
+<<<<<<< HEAD
 // SECURITY: Ensure only logged-in staff can access this search
+=======
+// SECURITY
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'Staff') {
     exit;
 }
@@ -22,6 +26,7 @@ $stmt->bind_param("s", $like);
 $stmt->execute();
 $result = $stmt->get_result();
 
+<<<<<<< HEAD
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()):
 ?>
@@ -43,3 +48,16 @@ if ($result->num_rows > 0) {
           </td></tr>";
 }
 ?>
+=======
+while ($row = $result->fetch_assoc()):
+?>
+<tr>
+    <td><?= htmlspecialchars($row['name']) ?></td>
+    <td><?= htmlspecialchars($row['cat_name']) ?></td>
+    <td><?= $row['quantity'] ?></td>
+    <td><?= htmlspecialchars($row['unit']) ?></td>
+    <td><?= htmlspecialchars($row['supplier']) ?></td>
+    <td><?= $row['price'] ?></td>
+</tr>
+<?php endwhile; ?>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f

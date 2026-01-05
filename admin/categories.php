@@ -18,8 +18,12 @@ if (isset($_POST['add'])) {
     $stmt->bind_param("ss", $name, $desc);
     $stmt->execute();
 
+<<<<<<< HEAD
     // FIXED: Use JavaScript redirect to avoid Header Warning
     echo "<script>window.location.href='dashboard.php?page=categories&status=added';</script>";
+=======
+    header("Location: dashboard.php?page=categories");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -33,8 +37,12 @@ if (isset($_GET['delete'])) {
     $stmt->bind_param("i", $id);
     $stmt->execute();
 
+<<<<<<< HEAD
     // FIXED: Use JavaScript redirect
     echo "<script>window.location.href='dashboard.php?page=categories&status=deleted';</script>";
+=======
+    header("Location: dashboard.php?page=categories");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -52,8 +60,12 @@ if (isset($_POST['update'])) {
     $stmt->bind_param("ssi", $name, $desc, $id);
     $stmt->execute();
 
+<<<<<<< HEAD
     // FIXED: Use JavaScript redirect
     echo "<script>window.location.href='dashboard.php?page=categories&status=updated';</script>";
+=======
+    header("Location: dashboard.php?page=categories");
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
     exit;
 }
 
@@ -65,6 +77,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
+<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid mt-4">
@@ -84,11 +97,31 @@ $result = $stmt->get_result();
             </div>
             <div class="col-12 col-md-3 d-flex align-items-end">
                 <button name="add" class="btn btn-primary w-100">Add Category</button>
+=======
+<h4 class="mb-3">Category Management</h4>
+
+<!-- ADD CATEGORY -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="mb-3">Add Category</h6>
+        <form method="POST" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="name" class="form-control"
+                       placeholder="Category Name" required>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="description" class="form-control"
+                       placeholder="Description">
+            </div>
+            <div class="col-md-3 text-end">
+                <button name="add" class="btn btn-primary">Add Category</button>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
             </div>
         </form>
     </div>
 </div>
 
+<<<<<<< HEAD
 <div class="card mb-3 shadow-sm">
     <div class="card-body">
         <input type="text" id="searchCategory" class="form-control" placeholder="Search category...">
@@ -180,13 +213,80 @@ Swal.fire({ icon: 'success', title: 'Category Deleted', timer: 1500, showConfirm
 </script>
 <?php endif; ?>
 
+=======
+<!-- LIVE SEARCH -->
+<div class="card mb-3">
+    <div class="card-body">
+        <input type="text" id="searchCategory"
+               class="form-control"
+               placeholder="Search category...">
+    </div>
+</div>
+
+<!-- CATEGORY TABLE -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th width="180">Action</th>
+                </tr>
+            </thead>
+            <tbody id="categoryTable">
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <form method="POST">
+                        <td>
+                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                            <input type="text" name="name"
+                                   value="<?= $row['name'] ?>"
+                                   class="form-control" required>
+                        </td>
+                        <td>
+                            <input type="text" name="description"
+                                   value="<?= $row['description'] ?>"
+                                   class="form-control">
+                        </td>
+                        <td class="text-center">
+                            <button name="update"
+                                    class="btn btn-success btn-sm">Update</button>
+                            <a href="dashboard.php?page=categories&delete=<?= $row['id'] ?>"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this category?')">
+                               Delete
+                            </a>
+                        </td>
+                    </form>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- LIVE SEARCH SCRIPT -->
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
 <script>
 const searchCategory = document.getElementById("searchCategory");
 const categoryTable = document.getElementById("categoryTable");
 
 searchCategory.addEventListener("keyup", function () {
+<<<<<<< HEAD
     fetch("admin/categories_search.php?q=" + encodeURIComponent(this.value))
         .then(res => res.text())
         .then(data => categoryTable.innerHTML = data);
 });
 </script>
+=======
+    const query = this.value;
+
+    fetch("admin/categories_search.php?q=" + encodeURIComponent(query))
+        .then(res => res.text())
+        .then(data => {
+            categoryTable.innerHTML = data;
+        });
+});
+</script>
+>>>>>>> 8950efdb46d49b2ebfdc5f6dc576dfb15f16179f
